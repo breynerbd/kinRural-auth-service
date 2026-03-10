@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "C1epVSIytXA=",
+  "dgSpecHash": "qEU1NkvdieQ=",
   "success": true,
-  "projectFilePath": "C:\\KinalSport\\auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
+  "projectFilePath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hogar\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
     "C:\\Users\\hogar\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",

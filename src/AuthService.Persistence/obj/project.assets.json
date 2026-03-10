@@ -3066,11 +3066,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\KinalSport\\auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
+      "projectUniqueName": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
       "projectName": "AuthService.Persistence",
-      "projectPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
+      "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
       "packagesPath": "C:\\Users\\hogar\\.nuget\\packages\\",
-      "outputPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Persistence\\obj\\",
+      "outputPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hogar\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3085,11 +3085,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\KinalSport\\auth-service\\src\\AuthService.Application\\AuthService.Application.csproj": {
-              "projectPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Application\\AuthService.Application.csproj"
+            "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj": {
+              "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj"
             },
-            "C:\\KinalSport\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
-              "projectPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
+            "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
+              "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
             }
           }
         }

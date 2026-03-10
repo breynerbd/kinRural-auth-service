@@ -1012,11 +1012,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\KinalSport\\auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "projectUniqueName": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
       "projectName": "AuthService.Application",
-      "projectPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
       "packagesPath": "C:\\Users\\hogar\\.nuget\\packages\\",
-      "outputPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Application\\obj\\",
+      "outputPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hogar\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1031,8 +1031,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\KinalSport\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
-              "projectPath": "C:\\KinalSport\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
+            "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
+              "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
             }
           }
         }
@@ -1104,5 +1104,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "El paquete \"MimeKit\" 4.15.0 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-g7hc-96xr-gvvx",
+      "libraryId": "MimeKit",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

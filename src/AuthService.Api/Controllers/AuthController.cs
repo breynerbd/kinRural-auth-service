@@ -58,7 +58,15 @@ if (existingUser != null)
 
     await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
 
-    return Ok("User registered successfully");
+return Ok(new
+{
+    message = "User registered successfully",
+    user = new
+    {
+        id = user.Id,
+        email = user.Email
+    }
+});
 }
 
     [HttpPost("login")]
