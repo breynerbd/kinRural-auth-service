@@ -1007,19 +1007,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\hogar\\.nuget\\packages\\": {}
+    "C:\\Users\\WELCOME KENNETH\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "projectUniqueName": "C:\\2021255\\auths\\Kinrural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
       "projectName": "AuthService.Application",
-      "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
-      "packagesPath": "C:\\Users\\hogar\\.nuget\\packages\\",
-      "outputPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\obj\\",
+      "projectPath": "C:\\2021255\\auths\\Kinrural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "packagesPath": "C:\\Users\\WELCOME KENNETH\\.nuget\\packages\\",
+      "outputPath": "C:\\2021255\\auths\\Kinrural\\kinRural-auth-service\\src\\AuthService.Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\hogar\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\WELCOME KENNETH\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -1031,8 +1031,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
-              "projectPath": "C:\\2021497\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
+            "C:\\2021255\\auths\\Kinrural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
+              "projectPath": "C:\\2021255\\auths\\Kinrural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
             }
           }
         }
@@ -1101,11 +1101,21 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
       }
     }
   },
   "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "El paquete \"MailKit\" 4.15.0 tiene una vulnerabilidad de gravedad moderada conocida, https://github.com/advisories/GHSA-9j88-vvj5-vhgr",
+      "libraryId": "MailKit",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
     {
       "code": "NU1902",
       "level": "Warning",
