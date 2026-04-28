@@ -30,9 +30,9 @@ namespace AuthService.Application.Services
             
             var claims = new List<Claim>
             {
-                new Claim("id", user.Id),
-                new Claim("name", $"{user.Name} {user.Surname}"),
-                new Claim("email", user.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), // usar "sub" en lugar de "id"
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("role", roles.First()) // o el URI de Microsoft si quieres mantener compatibilidad
             };
 
             foreach (var role in roles)

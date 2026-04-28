@@ -622,3 +622,5 @@ C:\2021497\kinRural-auth-service\src\AuthService.Api\obj\Debug\net8.0\AuthServic
 C:\2021497\kinRural-auth-service\src\AuthService.Api\obj\Debug\net8.0\AuthService.Api.pdb
 C:\2021497\kinRural-auth-service\src\AuthService.Api\obj\Debug\net8.0\AuthService.Api.genruntimeconfig.cache
 C:\2021497\kinRural-auth-service\src\AuthService.Api\obj\Debug\net8.0\ref\AuthService.Api.dll
+C:\2021497\KinRural\kinRural-auth-service\src\AuthService.Api\bin\Debug\net8.0\AuthService.Api.xml
+C:\2021497\KinRural\kinRural-auth-service\src\AuthService.Api\obj\Debug\net8.0\AuthService.Api.xml
