@@ -30,14 +30,14 @@ namespace AuthService.Application.Services
             
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, $"{user.Name} {user.Surname}"),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim("id", user.Id),
+                new Claim("name", $"{user.Name} {user.Surname}"),
+                new Claim("email", user.Email)
             };
 
             foreach (var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim("role", role));
             }
 
             var token = new JwtSecurityToken(

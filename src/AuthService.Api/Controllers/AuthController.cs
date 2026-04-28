@@ -119,7 +119,7 @@ if (existingUser != null)
 public async Task<IActionResult> Me()
 {
     // Obtenemos el Id del usuario desde el token
-    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var userId = User.FindFirst("id")?.Value;
     if (string.IsNullOrEmpty(userId))
         return Unauthorized();
 
