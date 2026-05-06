@@ -1007,19 +1007,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\hogar\\.nuget\\packages\\": {}
+    "C:\\Users\\andya\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\2021497\\Mañana\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "projectUniqueName": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
       "projectName": "AuthService.Application",
-      "projectPath": "C:\\2021497\\Mañana\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
-      "packagesPath": "C:\\Users\\hogar\\.nuget\\packages\\",
-      "outputPath": "C:\\2021497\\Mañana\\kinRural-auth-service\\src\\AuthService.Application\\obj\\",
+      "projectPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj",
+      "packagesPath": "C:\\Users\\andya\\.nuget\\packages\\",
+      "outputPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\hogar\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\andya\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -1031,8 +1031,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\2021497\\Mañana\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
-              "projectPath": "C:\\2021497\\Mañana\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
+            "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
+              "projectPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
             }
           }
         }
@@ -1046,7 +1046,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -1101,7 +1102,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.420/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   },

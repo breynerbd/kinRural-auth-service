@@ -5,8 +5,8 @@ namespace AuthService.Domain.Entitis;
 public class User
 {
     [Key]
-    [MaxLength(16)]
-    public string Id { get; set; } = string.Empty;
+    [MaxLength(36)]
+public string Id { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
     [MaxLength(25)]
