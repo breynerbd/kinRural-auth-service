@@ -42,11 +42,11 @@ public static class DataSeeder
             var adminUser = new User
             {
                 Id = userId,
-                Name = "Admin",
-                Surname = "User",
+                Name = "admin",
+                Surname = "user",
                 Username = "admin",
-                Email = "admin@ksports.local",
-                Password = BCrypt.Net.BCrypt.HashPassword("12345678"),
+                Email = "admin@kinrural.local",
+                Password = BCrypt.Net.BCrypt.HashPassword("admin123!"),
                 Status = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,

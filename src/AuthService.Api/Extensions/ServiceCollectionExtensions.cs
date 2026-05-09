@@ -13,8 +13,15 @@ public static class ServiceCollectionExtensions
     {
         // INICIALIZANDO EL CONEXIÓN A LA BASE DE DATOS
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-                   .UseSnakeCaseNamingConvention());
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            Console.WriteLine("CONNECTION STRING:");
+            Console.WriteLine(connectionString);
+
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention();
+        });
 
         // INICIALIZANDO EL SERVICIO DE EMAIL
         services.AddScoped<IEmailService, EmailService>();

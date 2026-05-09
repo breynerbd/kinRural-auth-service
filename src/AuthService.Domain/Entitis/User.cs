@@ -9,19 +9,20 @@ public class User
 public string Id { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
-    [MaxLength(25)]
+    [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El apellido es obligatorio")]
-    [MaxLength(16)]
+    [MaxLength(100)]
     public string Surname { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(25)]
+    [MaxLength(50)]
     public string Username { get; set; } = string.Empty;
 
     [Required]
     [EmailAddress]
+    [MaxLength(150)]
     public string Email { get; set; } = string.Empty;
 
     [Required]

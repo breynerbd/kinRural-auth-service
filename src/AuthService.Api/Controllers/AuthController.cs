@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
 public async Task<IActionResult> Register(RegisterRequest request)
 {
     if (await _userRepository.ExistsByEmailAsync(request.Email))
-        return BadRequest("Email already exists");
+        return BadRequest("El correo electrónico ya está en uso.");
 
 
     var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
@@ -76,7 +76,16 @@ if (existingUser != null)
 
     await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
 
-    return Ok("User registered successfully");
+return Ok(new
+{
+    message = "User registered successfully",
+    user = new
+    {
+        id = user.Id,
+        username = user.Username,
+        email = user.Email
+    }
+});
 }
 
     /// <summary>
@@ -88,22 +97,35 @@ if (existingUser != null)
     /// <param name="loginDto">Credenciales del usuario.</param>
     /// <response code="200">Login exitoso.</response>
     /// <response code="401">Credenciales inválidas.</response>
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest request)
+[HttpPost("login")]
+public async Task<IActionResult> Login(LoginRequest request)
+{
+    User? user;
+
+    // Detecta si el input parece un email
+if (request.Identifier.Contains("@"))
+{
+    user = await _userRepository.GetByEmailAsync(request.Identifier);
+}
+else
+{
+    user = await _userRepository.GetByUsernameAsync(request.Identifier);
+}
+    if (user == null)
+        return Unauthorized("Credenciales inválidas.");
+
+    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        return Unauthorized("Credenciales inválidas.");
+
+    var roles = await _userRepository.GetUserRolesAsync(user.Id);
+
+    var token = _jwtTokenGenerator.GenerateToken(user, roles);
+
+    return Ok(new
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
-        if (user == null)
-            return Unauthorized("Credenciales inválidas.");
-
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-            return Unauthorized("Credenciales inválidas.");
-
-        var roles = await _userRepository.GetUserRolesAsync(user.Id);
-
-        var token = _jwtTokenGenerator.GenerateToken(user, roles);
-
-        return Ok(new { accessToken = token });
-    }
+        accessToken = token
+    });
+}
 
 /// <summary>
     /// Obtiene el perfil del usuario autenticado.

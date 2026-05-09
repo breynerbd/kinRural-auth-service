@@ -28,17 +28,17 @@ namespace AuthService.Application.Services
                 SecurityAlgorithms.HmacSha256
             );
 
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Username)
-            };
+var claims = new List<Claim>
+{
+    new Claim("sub", user.Id.ToString()),
+    new Claim("email", user.Email),
+    new Claim("username", user.Username)
+};
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+foreach (var role in roles)
+{
+    claims.Add(new Claim("role", role));
+}
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],

@@ -1,0 +1,2 @@
+crea y ejecuta un contenedor de PostgreSQL en Docker
+docker run -d --name kinrural_postgres -e POSTGRES_DB=kinrural_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p 5433:5432 -v kinrural_postgres_data:/var/lib/postgresql/data postgres:15
