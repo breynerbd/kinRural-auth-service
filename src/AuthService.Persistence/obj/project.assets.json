@@ -3061,19 +3061,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\andya\\.nuget\\packages\\": {}
+    "C:\\Users\\Informatica\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
+      "projectUniqueName": "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
       "projectName": "AuthService.Persistence",
-      "projectPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
-      "packagesPath": "C:\\Users\\andya\\.nuget\\packages\\",
-      "outputPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Persistence\\obj\\",
+      "projectPath": "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Persistence\\AuthService.Persistence.csproj",
+      "packagesPath": "C:\\Users\\Informatica\\.nuget\\packages\\",
+      "outputPath": "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Persistence\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\andya\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Informatica\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -3085,11 +3085,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj": {
-              "projectPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj"
+            "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj": {
+              "projectPath": "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Application\\AuthService.Application.csproj"
             },
-            "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
-              "projectPath": "C:\\2021496\\KinRural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
+            "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj": {
+              "projectPath": "C:\\2021496\\Proyectos\\Kinrural\\kinRural-auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj"
             }
           }
         }
@@ -3103,8 +3103,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "10.0.100"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -3145,7 +3144,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\Informatica\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

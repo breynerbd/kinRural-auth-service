@@ -5,11 +5,11 @@ using AuthService.Domain.Entitis;
 using AuthService.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using AuthService.Application.DTOs;
 using AuthService.Application.DTOs.Email;
 using AuthService.Application.Interfaces;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Text;
+using System.Text.Json;
 
 namespace AuthService.Api.Controllers;
 
@@ -37,156 +37,226 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Registra un nuevo usuario.
     /// </summary>
-    /// <remarks>
-    /// Este endpoint permite registrar un usuario enviando los datos mediante multipart/form-data.
-    /// Soporta carga de imagen de perfil.
-    /// </remarks>
-    /// <param name="registerDto">Datos del usuario a registrar.</param>
-    /// <response code="201">Usuario registrado exitosamente.</response>
-    /// <response code="400">Datos inválidos.</response>
-    /// <response code="409">El usuario ya existe.</response>
     [HttpPost("register")]
-public async Task<IActionResult> Register(RegisterRequest request)
-{
-    if (await _userRepository.ExistsByEmailAsync(request.Email))
-        return BadRequest("El correo electrónico ya está en uso.");
-
-
-    var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
-if (existingUser != null)
-{
-    return BadRequest(new { Message = "El nombre de usuario ya está en uso." });
-}
-    var user = new User
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
-        Id = Guid.NewGuid().ToString("N")[..16],
-        Name = request.Name,
-        Surname = request.Surname,
-        Username = request.Username,
-        Email = request.Email,
-        Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-        Status = true,
-        CreatedAt = DateTime.UtcNow,
-        UpdatedAt = DateTime.UtcNow
-    };
+        try
+        {
+            // =========================
+            // VALIDAR EMAIL
+            // =========================
+            if (await _userRepository.ExistsByEmailAsync(request.Email))
+            {
+                return BadRequest(new
+                {
+                    message = "El correo electrónico ya está en uso."
+                });
+            }
 
-    await _userRepository.CreateAsync(user);
+            // =========================
+            // VALIDAR USERNAME
+            // =========================
+            var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
 
-    var userRole = await _roleRepository.GetByNameAsync("USER");
+            if (existingUser != null)
+            {
+                return BadRequest(new
+                {
+                    message = "El nombre de usuario ya está en uso."
+                });
+            }
 
-    await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
+            // =========================
+            // CREAR USUARIO AUTH
+            // =========================
+            var user = new User
+            {
+                Id = Guid.NewGuid().ToString("N")[..16],
+                Name = request.Name,
+                Surname = request.Surname,
+                Username = request.Username,
+                Email = request.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Status = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
-return Ok(new
-{
-    message = "User registered successfully",
-    user = new
-    {
-        id = user.Id,
-        username = user.Username,
-        email = user.Email
+            await _userRepository.CreateAsync(user);
+
+            // =========================
+            // ASIGNAR ROL
+            // =========================
+            var userRole = await _roleRepository.GetByNameAsync("USER");
+
+            await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
+
+            // =========================
+            // SINCRONIZAR USER-SERVICE
+            // =========================
+            try
+            {
+                var httpClient = new HttpClient();
+
+                var payload = new
+                {
+                    auth_id = user.Id,
+                    nombre = user.Name,
+                    apellido = user.Surname,
+                    correo = user.Email,
+                    dpi = (string?)null,
+                    telefono = "PENDIENTE",
+                    direccion = "PENDIENTE",
+                    ingresos_mensuales = 0,
+                    role_id = 2
+                };
+
+                var content = new StringContent(
+                    JsonSerializer.Serialize(payload),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var response = await httpClient.PostAsync(
+                    "http://host.docker.internal:3005/kinrural/v1/internal/sync-user",
+                    content
+                );
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("❌ Error sincronizando user-service");
+                }
+            }
+            catch (Exception syncError)
+            {
+                Console.WriteLine($"❌ Sync Error: {syncError.Message}");
+            }
+
+            // =========================
+            // RESPUESTA
+            // =========================
+            return Ok(new
+            {
+                message = "User registered successfully",
+                user = new
+                {
+                    id = user.Id,
+                    username = user.Username,
+                    email = user.Email
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = ex.Message
+            });
+        }
     }
-});
-}
 
     /// <summary>
-    /// Inicia sesión en el sistema.
+    /// Inicia sesión.
     /// </summary>
-    /// <remarks>
-    /// Permite autenticar a un usuario con sus credenciales.
-    /// </remarks>
-    /// <param name="loginDto">Credenciales del usuario.</param>
-    /// <response code="200">Login exitoso.</response>
-    /// <response code="401">Credenciales inválidas.</response>
-[HttpPost("login")]
-public async Task<IActionResult> Login(LoginRequest request)
-{
-    User? user;
-
-    // Detecta si el input parece un email
-if (request.Identifier.Contains("@"))
-{
-    user = await _userRepository.GetByEmailAsync(request.Identifier);
-}
-else
-{
-    user = await _userRepository.GetByUsernameAsync(request.Identifier);
-}
-    if (user == null)
-        return Unauthorized("Credenciales inválidas.");
-
-    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-        return Unauthorized("Credenciales inválidas.");
-
-    var roles = await _userRepository.GetUserRolesAsync(user.Id);
-
-    var token = _jwtTokenGenerator.GenerateToken(user, roles);
-
-    return Ok(new
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
     {
-        accessToken = token
-    });
-}
+        User? user;
 
-/// <summary>
-    /// Obtiene el perfil del usuario autenticado.
-    /// </summary>
-    /// <remarks>
-    /// Requiere un token JWT válido en el header Authorization.
-    /// </remarks>
-    /// <response code="200">Perfil obtenido exitosamente.</response>
-    /// <response code="401">No autorizado.</response>
-    /// <response code="404">Usuario no encontrado.</response>
-    [Authorize]
-[HttpGet("me")]
-public async Task<IActionResult> Me()
-{
-    // Obtenemos el Id del usuario desde el token
-    var userId = User.FindFirst("id")?.Value;
-    if (string.IsNullOrEmpty(userId))
-        return Unauthorized();
-
-    // Traemos al usuario con todas sus relaciones necesarias
-    var user = await _userRepository.GetByIdAsync(userId);
-
-    if (user == null)
-        return NotFound("Usuario no encontrado.");
-
-    // Construimos la respuesta
-    var result = new
-    {
-        user.Id,
-        user.Name,
-        user.Surname,
-        user.Username,
-        user.Email,
-        Status = user.Status,
-        CreatedAt = user.CreatedAt,
-        UpdatedAt = user.UpdatedAt,
-        EmailVerified = user.UserEmail?.EmailVerified ?? false,
-        Profile = user.UserProfile != null ? new
+        // =========================
+        // LOGIN POR EMAIL O USERNAME
+        // =========================
+        if (request.Identifier.Contains("@"))
         {
-            user.UserProfile.ProfilePictureUrl,
-            user.UserProfile.Bio,
-            user.UserProfile.DateOfBirth
-        } : null,
-        Roles = user.UserRoles.Select(r => r.Role.Name).ToList()
-    };
+            user = await _userRepository.GetByEmailAsync(request.Identifier);
+        }
+        else
+        {
+            user = await _userRepository.GetByUsernameAsync(request.Identifier);
+        }
 
-    return Ok(result);
-}
+        if (user == null)
+        {
+            return Unauthorized("Credenciales inválidas.");
+        }
+
+        // =========================
+        // VALIDAR PASSWORD
+        // =========================
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        {
+            return Unauthorized("Credenciales inválidas.");
+        }
+
+        // =========================
+        // GENERAR TOKEN
+        // =========================
+        var roles = await _userRepository.GetUserRolesAsync(user.Id);
+
+        var token = _jwtTokenGenerator.GenerateToken(user, roles);
+
+        return Ok(new
+        {
+            accessToken = token
+        });
+    }
+
+    /// <summary>
+    /// Perfil del usuario autenticado.
+    /// </summary>
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userId = User.FindFirst("id")?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userRepository.GetByIdAsync(userId);
+
+        if (user == null)
+        {
+            return NotFound("Usuario no encontrado.");
+        }
+
+        var result = new
+        {
+            user.Id,
+            user.Name,
+            user.Surname,
+            user.Username,
+            user.Email,
+            Status = user.Status,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+
+            EmailVerified = user.UserEmail?.EmailVerified ?? false,
+
+            Profile = user.UserProfile != null
+                ? new
+                {
+                    user.UserProfile.ProfilePictureUrl,
+                    user.UserProfile.Bio,
+                    user.UserProfile.DateOfBirth
+                }
+                : null,
+
+            Roles = user.UserRoles.Select(r => r.Role.Name).ToList()
+        };
+
+        return Ok(result);
+    }
 
     /// <summary>
     /// Solicita recuperación de contraseña.
     /// </summary>
-    /// <remarks>
-    /// Siempre devuelve éxito por seguridad, incluso si el usuario no existe.
-    /// </remarks>
-    /// <param name="forgotPasswordDto">Correo del usuario.</param>
-    /// <response code="200">Correo enviado (si aplica).</response>
-    /// <response code="503">Error al enviar el correo.</response>
-[HttpPost("forgot-password")]
+    [HttpPost("forgot-password")]
     [EnableRateLimiting("AuthPolicy")]
-    public async Task<ActionResult<EmailResponseDto>> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+    public async Task<ActionResult<EmailResponseDto>> ForgotPassword(
+        [FromBody] ForgotPasswordDto forgotPasswordDto)
     {
         var result = await _authService.ForgotPasswordAsync(forgotPasswordDto);
 
@@ -199,40 +269,41 @@ public async Task<IActionResult> Me()
     }
 
     /// <summary>
-    /// Restablece la contraseña del usuario.
+    /// Restablece contraseña.
     /// </summary>
-    /// <param name="resetPasswordDto">Token y nueva contraseña.</param>
-    /// <response code="200">Contraseña actualizada correctamente.</response>
-    /// <response code="400">Token inválido o expirado.</response>
     [HttpPost("reset-password")]
     [EnableRateLimiting("AuthPolicy")]
-    public async Task<ActionResult<EmailResponseDto>> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    public async Task<ActionResult<EmailResponseDto>> ResetPassword(
+        [FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await _authService.ResetPasswordAsync(resetPasswordDto);
+
         return Ok(result);
     }
 
     /// <summary>
-    /// Reenvía el correo de verificación.
+    /// Reenvía verificación.
     /// </summary>
-    /// <param name="resendDto">Correo del usuario.</param>
-    /// <response code="200">Correo reenviado exitosamente.</response>
-    /// <response code="400">El correo ya está verificado.</response>
-    /// <response code="404">Usuario no encontrado.</response>
-    /// <response code="503">Error al enviar el correo.</response>
     [HttpPost("resend-verification")]
     [EnableRateLimiting("AuthPolicy")]
-    public async Task<ActionResult<EmailResponseDto>> ResendVerification([FromBody] ResendVerificationDto resendDto)
+    public async Task<ActionResult<EmailResponseDto>> ResendVerification(
+        [FromBody] ResendVerificationDto resendDto)
     {
         var result = await _authService.ResendVerificationEmailAsync(resendDto);
 
         if (!result.Success)
         {
-            if (result.Message.Contains("no encontrado", StringComparison.OrdinalIgnoreCase))
+            if (result.Message.Contains("no encontrado",
+                StringComparison.OrdinalIgnoreCase))
+            {
                 return NotFound(result);
+            }
 
-            if (result.Message.Contains("ya ha sido verificado", StringComparison.OrdinalIgnoreCase))
+            if (result.Message.Contains("ya ha sido verificado",
+                StringComparison.OrdinalIgnoreCase))
+            {
                 return BadRequest(result);
+            }
 
             return StatusCode(503, result);
         }
