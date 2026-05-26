@@ -10,6 +10,8 @@ using AuthService.Application.Interfaces;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 using System.Text.Json;
+using System.Net.Http;
+
 
 namespace AuthService.Api.Controllers;
 
@@ -21,139 +23,158 @@ public class AuthController : ControllerBase
     private readonly IRoleRepository _roleRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IAuthService _authService;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public AuthController(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        IJwtTokenGenerator jwtTokenGenerator,
-        IAuthService authService)
-    {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
-        _jwtTokenGenerator = jwtTokenGenerator;
-        _authService = authService;
-    }
+public AuthController(
+    IUserRepository userRepository,
+    IRoleRepository roleRepository,
+    IJwtTokenGenerator jwtTokenGenerator,
+    IAuthService authService,
+    IHttpClientFactory httpClientFactory)
+{
+    _userRepository = userRepository;
+    _roleRepository = roleRepository;
+    _jwtTokenGenerator = jwtTokenGenerator;
+    _authService = authService;
+    _httpClientFactory = httpClientFactory;
+}
 
-    /// <summary>
-    /// Registra un nuevo usuario.
-    /// </summary>
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest request)
+/// <summary>
+/// Registra un nuevo usuario.
+/// </summary>
+[HttpPost("register")]
+public async Task<IActionResult> Register(RegisterRequest request)
+{
+    try
     {
-        try
+        // =========================
+        // VALIDAR EMAIL
+        // =========================
+        if (await _userRepository.ExistsByEmailAsync(request.Email))
         {
-            // =========================
-            // VALIDAR EMAIL
-            // =========================
-            if (await _userRepository.ExistsByEmailAsync(request.Email))
+            return BadRequest(new
             {
-                return BadRequest(new
-                {
-                    message = "El correo electrónico ya está en uso."
-                });
-            }
-
-            // =========================
-            // VALIDAR USERNAME
-            // =========================
-            var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
-
-            if (existingUser != null)
-            {
-                return BadRequest(new
-                {
-                    message = "El nombre de usuario ya está en uso."
-                });
-            }
-
-            // =========================
-            // CREAR USUARIO AUTH
-            // =========================
-            var user = new User
-            {
-                Id = Guid.NewGuid().ToString("N")[..16],
-                Name = request.Name,
-                Surname = request.Surname,
-                Username = request.Username,
-                Email = request.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Status = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _userRepository.CreateAsync(user);
-
-            // =========================
-            // ASIGNAR ROL
-            // =========================
-            var userRole = await _roleRepository.GetByNameAsync("USER");
-
-            await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
-
-            // =========================
-            // SINCRONIZAR USER-SERVICE
-            // =========================
-            try
-            {
-                var httpClient = new HttpClient();
-
-                var payload = new
-                {
-                    auth_id = user.Id,
-                    nombre = user.Name,
-                    apellido = user.Surname,
-                    correo = user.Email,
-                    dpi = (string?)null,
-                    telefono = "PENDIENTE",
-                    direccion = "PENDIENTE",
-                    ingresos_mensuales = 0,
-                    role_id = 2
-                };
-
-                var content = new StringContent(
-                    JsonSerializer.Serialize(payload),
-                    Encoding.UTF8,
-                    "application/json"
-                );
-
-                var response = await httpClient.PostAsync(
-                    "http://host.docker.internal:3005/kinrural/v1/internal/sync-user",
-                    content
-                );
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("❌ Error sincronizando user-service");
-                }
-            }
-            catch (Exception syncError)
-            {
-                Console.WriteLine($"❌ Sync Error: {syncError.Message}");
-            }
-
-            // =========================
-            // RESPUESTA
-            // =========================
-            return Ok(new
-            {
-                message = "User registered successfully",
-                user = new
-                {
-                    id = user.Id,
-                    username = user.Username,
-                    email = user.Email
-                }
+                message = "El correo electrónico ya está en uso."
             });
         }
-        catch (Exception ex)
+
+        // =========================
+        // VALIDAR USERNAME
+        // =========================
+        var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
+
+        if (existingUser != null)
+        {
+            return BadRequest(new
+            {
+                message = "El nombre de usuario ya está en uso."
+            });
+        }
+
+        // =========================
+        // CREAR USUARIO AUTH
+        // =========================
+        var user = new User
+        {
+            Id = Guid.NewGuid().ToString("N")[..16],
+            Name = request.Name,
+            Surname = request.Surname,
+            Username = request.Username,
+            Email = request.Email,
+            Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Status = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        await _userRepository.CreateAsync(user);
+
+        // =========================
+        // ASIGNAR ROL (DINÁMICO)
+        // =========================
+        var roleName = string.IsNullOrWhiteSpace(request.Role)
+            ? "USER"
+            : request.Role.ToUpper();
+
+        var userRole = await _roleRepository.GetByNameAsync(roleName);
+
+        if (userRole == null)
+        {
+            return BadRequest(new
+            {
+                message = "Rol inválido."
+            });
+        }
+
+        await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
+
+        // =========================
+        // SINCRONIZAR USER-SERVICE
+        // =========================
+        var httpClient = _httpClientFactory.CreateClient();
+
+        Console.WriteLine($"ROLE ID: {userRole.Id}");
+        Console.WriteLine($"USER ID: {user.Id}");
+
+        var syncPayload = new
+        {
+            auth_id = user.Id,
+            nombre = request.Name,
+            apellido = request.Surname,
+            correo = request.Email,
+            dpi = request.Dpi,
+            telefono = request.Telefono,
+            direccion = request.Direccion,
+            ingresos_mensuales = request.IngresosMensuales,
+            role = userRole.Name
+        };
+
+        var json = JsonSerializer.Serialize(syncPayload);
+
+        var content = new StringContent(
+            json,
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await httpClient.PostAsync(
+            "http://localhost:3005/kinrural/v1/internal/sync-user",
+            content
+        );
+
+        if (!response.IsSuccessStatusCode)
         {
             return StatusCode(500, new
             {
-                message = ex.Message
+                message = "Usuario auth creado pero falló sincronización con user-service."
             });
         }
+
+        // =========================
+        // RESPUESTA
+        // =========================
+        return Ok(new
+        {
+            message = "User registered successfully",
+            user = new
+            {
+                id = user.Id,
+                username = user.Username,
+                email = user.Email,
+                role = userRole.Name
+            }
+        });
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            message = ex.Message
+        });
+    }
+}
+
+
 
     /// <summary>
     /// Inicia sesión.
@@ -249,6 +270,55 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+
+/// <summary>
+/// Actualiza el rol de un usuario.
+/// </summary>
+
+
+
+[Authorize(Roles = "ADMIN")]
+[HttpPut("users/{id}/role")]
+public async Task<IActionResult> UpdateUserRole(
+    string id,
+    [FromBody] UpdateRoleRequest request)
+{
+    // =========================
+    // VALIDAR USUARIO
+    // =========================
+    var user = await _userRepository.GetByIdAsync(id);
+
+    if (user == null)
+    {
+        return NotFound(new
+        {
+            message = "Usuario no encontrado."
+        });
+    }
+
+    // =========================
+    // VALIDAR ROL
+    // =========================
+    var role = await _roleRepository.GetByNameAsync(request.Role);
+
+    if (role == null)
+    {
+        return NotFound(new
+        {
+            message = "Rol no encontrado."
+        });
+    }
+
+    // =========================
+    // ACTUALIZAR ROL
+    // =========================
+    await _userRepository.UpdateUserRoleAsync(id, role.Id);
+
+    return Ok(new
+    {
+        message = "Rol actualizado correctamente."
+    });
+}
 
     /// <summary>
     /// Solicita recuperación de contraseña.
