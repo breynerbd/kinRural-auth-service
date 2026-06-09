@@ -3,6 +3,7 @@ using AuthService.Application.DTOs.Auth;
 using AuthService.Application.Services;
 using AuthService.Domain.Entitis;
 using AuthService.Domain.Interfaces;
+using AuthService.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuthService.Application.DTOs.Email;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 using System.Text.Json;
 using System.Net.Http;
+using System.Security.Claims;
 
 
 namespace AuthService.Api.Controllers;
@@ -92,19 +94,35 @@ public async Task<IActionResult> Register(RegisterRequest request)
         // =========================
         // ASIGNAR ROL (DINÁMICO)
         // =========================
-        var roleName = string.IsNullOrWhiteSpace(request.Role)
-            ? "USER"
-            : request.Role.ToUpper();
+var roleName = string.IsNullOrWhiteSpace(request.Role)
+    ? RoleConstants.USER_ROL
+    : request.Role.ToUpper();
 
-        var userRole = await _roleRepository.GetByNameAsync(roleName);
+if (!RoleConstants.AllowedRoles.Contains(roleName))
+{
+    return BadRequest(new
+    {
+        message = "Rol inválido."
+    });
+}
 
-        if (userRole == null)
-        {
-            return BadRequest(new
-            {
-                message = "Rol inválido."
-            });
-        }
+if (roleName == RoleConstants.MASTER_ADMIN)
+{
+    return BadRequest(new
+    {
+        message = "No puedes asignar este rol."
+    });
+}
+
+var userRole = await _roleRepository.GetByNameAsync(roleName);
+
+if (userRole == null)
+{
+    return BadRequest(new
+    {
+        message = "Rol inválido."
+    });
+}
 
         await _userRepository.UpdateUserRoleAsync(user.Id, userRole.Id);
 
@@ -229,7 +247,7 @@ public async Task<IActionResult> Register(RegisterRequest request)
     [HttpGet("me")]
     public async Task<IActionResult> Me()
     {
-        var userId = User.FindFirst("id")?.Value;
+        var userId = User.FindFirst("sub")?.Value;
 
         if (string.IsNullOrEmpty(userId))
         {
@@ -277,24 +295,64 @@ public async Task<IActionResult> Register(RegisterRequest request)
 
 
 
-[Authorize(Roles = "ADMIN")]
+[Authorize(Roles = "MASTER_ADMIN,ADMIN")]
 [HttpPut("users/{id}/role")]
 public async Task<IActionResult> UpdateUserRole(
     string id,
     [FromBody] UpdateRoleRequest request)
 {
-    // =========================
-    // VALIDAR USUARIO
-    // =========================
-    var user = await _userRepository.GetByIdAsync(id);
+// =========================
+// VALIDAR USUARIO
+// =========================
+var user = await _userRepository.GetByIdAsync(id);
 
-    if (user == null)
+if (user == null)
+{
+    return NotFound(new
     {
-        return NotFound(new
+        message = "Usuario no encontrado."
+    });
+}
+
+var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+var targetRoles = user.UserRoles
+    .Select(r => r.Role.Name)
+    .ToList();
+
+var targetIsMasterAdmin =
+    targetRoles.Contains(RoleConstants.MASTER_ADMIN);
+
+var targetIsAdmin =
+    targetRoles.Contains(RoleConstants.ADMIN_ROL);
+
+// =========================
+// RESTRICCIONES ADMIN
+// =========================
+if (currentUserRole == RoleConstants.ADMIN_ROL)
+{
+    if (targetIsAdmin || targetIsMasterAdmin)
+    {
+        return StatusCode(403, new
         {
-            message = "Usuario no encontrado."
+            message = "No puedes modificar administradores."
         });
     }
+}
+
+// =========================
+// RESTRICCIONES MASTER_ADMIN
+// =========================
+if (currentUserRole == RoleConstants.MASTER_ADMIN)
+{
+    if (targetIsMasterAdmin)
+    {
+        return StatusCode(403, new
+        {
+            message = "No puedes modificar otro MASTER_ADMIN."
+        });
+    }
+}
 
     // =========================
     // VALIDAR ROL

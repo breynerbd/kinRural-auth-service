@@ -73,7 +73,14 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
+        var jwtKey = builder.Configuration["Jwt:Key"];
+
+        if (string.IsNullOrWhiteSpace(jwtKey))
+        {
+            throw new Exception("Jwt:Key no fue encontrada en la configuración.");
+        }
+
+        var key = Encoding.UTF8.GetBytes(jwtKey);
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
