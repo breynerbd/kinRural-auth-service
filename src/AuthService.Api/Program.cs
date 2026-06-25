@@ -69,6 +69,9 @@ builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 // JWT Token Generator
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+//verificacion por correo
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 // Autenticación JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

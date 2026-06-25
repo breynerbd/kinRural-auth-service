@@ -12,19 +12,20 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
     // Método para verificación de Email
     public async Task SendEmailVerificationAsync(string email, string username, string token)
     {
-        var subject = "Verify your email address";
+        var subject = "Bienvenido a kinRural! Verifica tu dirección de correo electrónico";
         var verificationUrl = $"{configuration["AppSettings:FrontendUrl"]}/verify-email?token={token}";
 
         var body = $@"
-            <h2>Welcome {username}!</h2>
-            <p>Please verify your email address by clicking the link below:</p>
+            <h2>Bienvenido a kinRural{username}!</h2>
+            <p>Por favor, verifica tu dirección de correo electrónico haciendo clic en el siguiente enlace:</p>
             <a href='{verificationUrl}' style='background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
-                Verify Email
+                Verifica tu correo
             </a>
-            <p>If you cannot click the link, copy and paste this URL into your browser:</p>
+            <p>Verificar dirección de correo electrónico
+Si no puedes hacer clic en el enlace, copia y pega esta URL en tu navegador:</p>
             <p>{verificationUrl}</p>
-            <p>This link will expire in 24 hours.</p>
-            <p>If you didn't create an account, please ignore this email.</p>
+            <p>Este enlace caducará en 24 horas.</p>
+            <p>Si no has creado una cuenta, ignora este correo electrónico.</p>
         ";
 
         await SendEmailAsync(email, subject, body);

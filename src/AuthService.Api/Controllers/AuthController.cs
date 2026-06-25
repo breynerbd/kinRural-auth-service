@@ -26,19 +26,22 @@ public class AuthController : ControllerBase
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IAuthService _authService;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IEmailService _emailService; //eliminar para no verificación por correo
 
 public AuthController(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
     IJwtTokenGenerator jwtTokenGenerator,
     IAuthService authService,
-    IHttpClientFactory httpClientFactory)
+    IHttpClientFactory httpClientFactory,
+    IEmailService emailService) //eliminar para no verificación por correo
 {
     _userRepository = userRepository;
     _roleRepository = roleRepository;
     _jwtTokenGenerator = jwtTokenGenerator;
     _authService = authService;
     _httpClientFactory = httpClientFactory;
+    _emailService = emailService;
 }
 
 /// <summary>
@@ -160,6 +163,8 @@ if (userRole == null)
             content
         );
 
+// ... (código anterior de sincronización)
+
         if (!response.IsSuccessStatusCode)
         {
             return StatusCode(500, new
@@ -169,11 +174,24 @@ if (userRole == null)
         }
 
         // =========================
-        // RESPUESTA
+        // ENVIAR EMAIL DE VERIFICACIÓN
+        // =========================
+        try 
+        {
+            await _emailService.SendEmailVerificationAsync(user.Email, user.Username, user.Id);
+        }
+        catch (Exception ex)
+        {
+            // Es bueno loguearlo para saber que falló, sin detener el registro
+            Console.WriteLine($"Error al enviar email de verificación: {ex.Message}");
+        }
+
+        // =========================
+        // RESPUESTA FINAL (Solo un return al final)
         // =========================
         return Ok(new
         {
-            message = "User registered successfully",
+            message = "User registered successfully. Please check your email to verify your account.",
             user = new
             {
                 id = user.Id,
@@ -185,10 +203,7 @@ if (userRole == null)
     }
     catch (Exception ex)
     {
-        return StatusCode(500, new
-        {
-            message = ex.Message
-        });
+        return StatusCode(500, new { message = ex.Message });
     }
 }
 
