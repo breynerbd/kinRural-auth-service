@@ -159,7 +159,7 @@ if (userRole == null)
         );
 
         var response = await httpClient.PostAsync(
-            "http://localhost:3005/kinrural/v1/internal/sync-user",
+            "http://kinrural-server-admin:3005/kinrural/v1/users/internal/sync-user",
             content
         );
 

@@ -6,37 +6,37 @@ public class RegisterRequest
 {
     [Required]
     [MaxLength(50)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [Required]
     [MaxLength(50)]
-    public string Surname { get; set; }
+    public required string Surname { get; set; }
 
     [Required]
     [MaxLength(50)]
-    public string Username { get; set; }
+    public required  string Username { get; set; }
 
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
+    public required string Email { get; set; }
 
     [Required]
     [MinLength(8)]
-    public string Password { get; set; }
+    public required string Password { get; set; }
 
     [Required]
     [StringLength(13, MinimumLength = 13)]
-    public string Dpi { get; set; }
+    public required string Dpi { get; set; }
 
     [Required]
-    public string Telefono { get; set; }
+    public required string Telefono { get; set; }
 
     [Required]
-    public string Direccion { get; set; }
+    public required string Direccion { get; set; }
 
     [Required]
-    public decimal IngresosMensuales { get; set; }
+    public required decimal IngresosMensuales { get; set; }
 
     // NUEVO
-    public string Role { get; set; } = "USER";
+    public required string Role { get; set; } = "USER";
 }

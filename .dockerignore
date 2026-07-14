@@ -1,0 +1,36 @@
+# Control de versiones
+.git
+.gitignore
+
+# Dependencias y paquetes (según tu lenguaje de programación)
+node_modules/
+bower_components/
+vendor/
+.venv/
+env/
+venv/
+ENV/
+
+# Logs y bases de datos locales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# Carpetas de compilación o build
+dist/
+build/
+out/
+.next/
+
+# Archivos del sistema operativo / Editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
